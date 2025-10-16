@@ -1,0 +1,102 @@
+﻿@page "/stockdamage"
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<h3>Stock Damage Entry</h3>
+
+<EditForm Model="damageModel" OnValidSubmit="SubmitDamage">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Godown</label>
+        <InputSelect @bind-Value="damageModel.GodownId" class="form-control">
+            <option value="">-- Select Godown --</option>
+            @foreach (var g in godowns)
+            {
+                <option value="@g.GodownNo">@g.GodownName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Sub Item</label>
+        <InputSelect @bind-Value="damageModel.SubItemCodeId" class="form-control">
+            <option value="">-- Select Sub Item --</option>
+            @foreach (var s in subItems)
+            {
+                <option value="@s.AutoSlNo">@s.SubItemName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Currency</label>
+        <InputSelect @bind-Value="damageModel.CurrencyId" class="form-control">
+            <option value="">-- Select Currency --</option>
+            @foreach (var c in currencies)
+            {
+                <option value="@c.CurrencyID">@c.CurrencyName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Employee</label>
+        <InputSelect @bind-Value="damageModel.EmployeeId" class="form-control">
+            <option value="">-- Select Employee --</option>
+            @foreach (var e in employees)
+            {
+                <option value="@e.EmployeeID">@e.EmployeeName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label>Damage Quantity</label>
+        <InputNumber @bind-Value="damageModel.DamageQuantity" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Damage Reason</label>
+        <InputText @bind-Value="damageModel.DamageReason" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label>Date</label>
+        <InputDate @bind-Value="damageModel.Date" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</EditForm>
+
+@code {
+    private StockDamageViewModel damageModel = new();
+    private List<GodownDto> godowns = new();
+    private List<SubItemCodeDto> subItems = new();
+    private List<CurrencyDto> currencies = new();
+    private List<EmployeeDto> employees = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        godowns = await Http.GetFromJsonAsync<List<GodownDto>>("api/Godown");
+        subItems = await Http.GetFromJsonAsync<List<SubItemCodeDto>>("api/SubItemCode");
+        currencies = await Http.GetFromJsonAsync<List<CurrencyDto>>("api/Currency");
+        employees = await Http.GetFromJsonAsync<List<EmployeeDto>>("api/Employee");
+    }
+
+    private async Task SubmitDamage()
+    {
+        var response = await Http.PostAsJsonAsync("api/StockDamage", new List<StockDamageViewModel> { damageModel });
+        if (response.IsSuccessStatusCode)
+        {
+            damageModel = new StockDamageViewModel();
+            await JS.InvokeVoidAsync("alert", "✅ Stock damage saved successfully!");
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            await JS.InvokeVoidAsync("alert", $"❌ Error: {error}");
+        }
+    }
+}

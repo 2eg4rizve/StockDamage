@@ -1,0 +1,11 @@
+﻿@using Microsoft.AspNetCore.Components.Routing
+<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(StockDamageBlazor.Shared.MainLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(StockDamageBlazor.Shared.MainLayout)">
+            <p class="m-3 text-danger">Sorry, the page was not found.</p>
+        </LayoutView>
+    </NotFound>
+</Router>

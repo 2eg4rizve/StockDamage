@@ -1,0 +1,80 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <!-- Main content -->
+    <main>
+        <div class="top-row px-4">
+            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+<!-- Error UI for Blazor -->
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+<style>
+    /* Layout styles */
+    .page {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .sidebar {
+        width: 200px;
+        background-color: #f8f9fa;
+        border-right: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .top-row {
+        display: flex;
+        justify-content: flex-end;
+        padding-bottom: 10px;
+    }
+
+    .content {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+
+    #blazor-error-ui {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #f44336;
+        color: white;
+        text-align: center;
+        padding: 5px;
+        display: none;
+    }
+
+        #blazor-error-ui a {
+            color: white;
+            text-decoration: underline;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+</style>
