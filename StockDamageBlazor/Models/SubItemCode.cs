@@ -1,6 +1,6 @@
 ﻿namespace StockDamageBlazor.Models
 {
-    public class SubItemCodeDto
+    public class SubItemCode
     {
         public int AutoSlNo { get; set; }
         public string SubItemCodeValue { get; set; } = string.Empty;

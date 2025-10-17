@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36408.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockDamageApi", "StockDamageApi\StockDamageApi.csproj", "{92C6A666-CBA7-430F-A617-947422A20AA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockDamageFrontEnd", "StockDamageFrontEnd\StockDamageFrontEnd.csproj", "{195274D3-287D-417A-8CCE-899A605E7679}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{92C6A666-CBA7-430F-A617-947422A20AA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92C6A666-CBA7-430F-A617-947422A20AA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92C6A666-CBA7-430F-A617-947422A20AA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{195274D3-287D-417A-8CCE-899A605E7679}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{195274D3-287D-417A-8CCE-899A605E7679}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{195274D3-287D-417A-8CCE-899A605E7679}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{195274D3-287D-417A-8CCE-899A605E7679}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

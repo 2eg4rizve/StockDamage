@@ -1,0 +1,288 @@
+﻿@page "/stockdamage"
+@using StockDamageFrontEnd.Models
+@using StockDamageFrontEnd.Services
+@inject GodownService GodownService
+@inject SubItemService SubItemService
+@inject StockService StockService
+@inject CurrencyService CurrencyService
+@inject EmployeeService EmployeeService
+@inject StockDamageService StockDamageService
+@inject IJSRuntime JS
+
+<h4>Stock Damage Entry</h4>
+
+<div class="card page-card p-3">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label">Warehouse</label>
+            <select class="form-select" @bind="form.GodownId">
+                <option value="0">-- Select --</option>
+                @foreach (var g in godowns)
+                {
+                    <option value="@g.AutoSlNo">@g.GodownName</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Item Name</label>
+            <select class="form-select" @onchange="ItemChanged">
+                <option value="">-- Select --</option>
+                @foreach (var s in subItems)
+                {
+                    <option value="@s.AutoSlNo">@s.SubItemName</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Item Code</label>
+            <input class="form-control" readonly value="@itemCode" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Unit</label>
+            <input class="form-control" readonly value="@form.Unit" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Stock</label>
+            <input class="form-control" readonly value="@form.Stock" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Batch No</label>
+            <input class="form-control" @bind="form.BatchNo" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Currency</label>
+            <select class="form-select" @onchange="CurrencyChanged">
+                <option value="0">-- Select --</option>
+                @foreach (var c in currencies)
+                {
+                    <option value="@c.CurrencyID">@c.CurrencyName</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Exchange Rate</label>
+            <input class="form-control" readonly value="@exchangeRate" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Quantity</label>
+            <input type="number" class="form-control" step="0.01" @bind="form.Quantity" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Rate</label>
+            <input type="number" class="form-control" step="0.01" @bind="form.Rate" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Amount In</label>
+            <input class="form-control" readonly value="@CalculateAmount()" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Dr A/C Head</label>
+            <input class="form-control" readonly value="@form.DrACHead" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Employee</label>
+            <select class="form-select" @bind="form.EmployeeId">
+                <option value="0">-- Select --</option>
+                @foreach (var e in employees)
+                {
+                    <option value="@e.EmployeeID">@e.EmployeeName</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-6">
+            <label class="form-label">Comments</label>
+            <input class="form-control" @bind="form.Comments" />
+        </div>
+
+        <div class="col-12 text-end mt-2">
+            <button class="btn btn-secondary me-2" @onclick="ClearForm">Clear</button>
+            <button class="btn btn-primary" @onclick="AddTemp">Add</button>
+        </div>
+    </div>
+</div>
+
+<!-- temporary table -->
+<div class="card p-3 table-temp">
+    <h6>Temporary Entries</h6>
+    <table class="table table-sm table-bordered">
+        <thead class="table-light">
+            <tr>
+                <th>#</th>
+                <th>Godown</th>
+                <th>Item</th>
+                <th>Code</th>
+                <th>Unit</th>
+                <th>Stock</th>
+                <th>Batch</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
+                <th>Emp</th>
+                <th>Comments</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (tempList.Any())
+            {
+                int i = 1;
+                foreach (var t in tempList)
+                {
+                    <tr>
+                        <td>@i</td>
+                        <td>@godowns.FirstOrDefault(g => g.AutoSlNo == t.GodownId)?.GodownName</td>
+                        <td>@t.ItemName</td>
+                        <td>@subItems.FirstOrDefault(s => s.AutoSlNo == t.SubItemId)?.SubItemCodeValue</td>
+                        <td>@t.Unit</td>
+                        <td>@t.Stock</td>
+                        <td>@t.BatchNo</td>
+                        <td>@t.Quantity</td>
+                        <td>@t.Rate</td>
+                        <td>@t.AmountIn</td>
+                        <td>@employees.FirstOrDefault(e => e.EmployeeID == t.EmployeeId)?.EmployeeName</td>
+                        <td>@t.Comments</td>
+                        <td><button class="btn btn-sm btn-danger" @onclick="() => RemoveTemp(t)">Remove</button></td>
+                    </tr>
+                    i++;
+                }
+            }
+            else
+            {
+                <tr><td colspan="13" class="text-center">No entries</td></tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end">
+        <button class="btn btn-success" @onclick="SaveAll" disabled="@(!tempList.Any())">Save All</button>
+    </div>
+</div>
+
+@code {
+    private List<Godown> godowns = new();
+    private List<SubItemCode> subItems = new();
+    private List<Currency> currencies = new();
+    private List<Employee> employees = new();
+    private List<Stock> stocks = new();
+
+    private StockDamageDto form = new() { BatchNo = "NA", DrACHead = "Stock Damage" };
+    private List<StockDamageDto> tempList = new();
+
+    private string itemCode = string.Empty;
+    private decimal exchangeRate = 0m;
+
+    protected override async Task OnInitializedAsync()
+    {
+        godowns = await GodownService.GetAllAsync();
+        subItems = await SubItemService.GetAllAsync();
+        currencies = await CurrencyService.GetAllAsync();
+        employees = await EmployeeService.GetAllAsync();
+        stocks = await StockService.GetAllAsync();
+    }
+
+    private async Task ItemChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e?.Value?.ToString(), out var id))
+        {
+            var item = subItems.FirstOrDefault(s => s.AutoSlNo == id);
+            if (item != null)
+            {
+                form.SubItemId = item.AutoSlNo;
+                form.ItemName = item.SubItemName;
+                form.Unit = item.Unit;
+                itemCode = item.SubItemCodeValue;
+                form.Stock = stocks.FirstOrDefault(s => s.SubItemCodeValue == item.SubItemCodeValue)?.Quantity ?? 0m;
+            }
+        }
+    }
+
+    private void CurrencyChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e?.Value?.ToString(), out var id))
+        {
+            form.CurrencyId = id;
+            exchangeRate = currencies.FirstOrDefault(c => c.CurrencyID == id)?.ConversionRate ?? 0m;
+        }
+    }
+
+    private decimal CalculateAmount()
+    {
+        var amt = form.Quantity * form.Rate;
+        return Math.Round(amt, 2);
+    }
+
+    private void ClearForm()
+    {
+        form = new StockDamageDto { BatchNo = "NA", DrACHead = "Stock Damage" };
+        itemCode = string.Empty;
+        exchangeRate = 0m;
+    }
+
+    private void AddTemp()
+    {
+        if (form.GodownId == 0 || form.SubItemId == 0 || form.Quantity <= 0)
+        {
+            _ = JS.InvokeVoidAsync("alert", "Please select Godown, Item and enter Quantity > 0");
+            return;
+        }
+
+        form.AmountIn = CalculateAmount();
+
+        // clone
+        var copy = new StockDamageDto
+        {
+            GodownId = form.GodownId,
+            SubItemId = form.SubItemId,
+            CurrencyId = form.CurrencyId,
+            EmployeeId = form.EmployeeId,
+            ItemName = form.ItemName,
+            Unit = form.Unit,
+            Stock = form.Stock,
+            BatchNo = string.IsNullOrWhiteSpace(form.BatchNo) ? "NA" : form.BatchNo,
+            Quantity = form.Quantity,
+            Rate = form.Rate,
+            AmountIn = form.AmountIn,
+            DrACHead = form.DrACHead,
+            Comments = form.Comments
+        };
+
+        tempList.Add(copy);
+
+        // reset part of form
+        form.Quantity = 0;
+        form.Rate = 0;
+        form.Comments = string.Empty;
+    }
+
+    private void RemoveTemp(StockDamageDto dto) => tempList.Remove(dto);
+
+    private async Task SaveAll()
+    {
+        if (!tempList.Any()) return;
+
+        var resp = await StockDamageService.SaveAsync(tempList);
+        if (resp.IsSuccessStatusCode)
+        {
+            await JS.InvokeVoidAsync("alert", "Saved successfully");
+            tempList.Clear();
+        }
+        else
+        {
+            var txt = await resp.Content.ReadAsStringAsync();
+            await JS.InvokeVoidAsync("alert", $"Save failed: {resp.StatusCode} - {txt}");
+        }
+    }
+}

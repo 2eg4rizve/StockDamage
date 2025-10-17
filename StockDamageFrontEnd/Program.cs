@@ -1,24 +1,22 @@
-﻿using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using StockDamageBlazor;
-using StockDamageBlazor.Services;
+using StockDamageFrontEnd;
+using StockDamageFrontEnd.Services;
+using System.Net.Http;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// HttpClient with backend API
-builder.Services.AddScoped(sp => new HttpClient
-{
-    BaseAddress = new Uri("https://localhost:7035/api/")
-});
+// HttpClient base points to your API
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7035/api/") });
 
-// Register services
+// register services
 builder.Services.AddScoped<GodownService>();
 builder.Services.AddScoped<SubItemService>();
+builder.Services.AddScoped<StockService>();
 builder.Services.AddScoped<CurrencyService>();
 builder.Services.AddScoped<EmployeeService>();
-builder.Services.AddScoped<StockService>();
 builder.Services.AddScoped<StockDamageService>();
 
 await builder.Build().RunAsync();

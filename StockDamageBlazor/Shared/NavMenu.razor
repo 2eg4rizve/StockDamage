@@ -1,35 +1,10 @@
-﻿<nav class="nav-menu">
-    <ul class="nav flex-column">
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </li>
-        <li class="nav-item px-3">
-            <NavLink class="nav-link" href="/stockdamage">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Stock Damage
-            </NavLink>
-        </li>
-    </ul>
+﻿<nav class="navbar navbar-expand-lg navbar-light bg-light p-3">
+    <a class="navbar-brand" href="/">Stock Damage</a>
+    <div class="collapse navbar-collapse">
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="/stockdamage">Stock Damage Entry</a>
+            </li>
+        </ul>
+    </div>
 </nav>
-
-<style>
-    .nav-menu {
-        width: 200px;
-        background-color: #f8f9fa;
-        height: 100vh;
-        padding: 10px;
-        border-right: 1px solid #ccc;
-    }
-
-    .nav-link {
-        color: #333;
-        display: block;
-        margin: 5px 0;
-    }
-
-        .nav-link.active {
-            font-weight: bold;
-            color: #007bff;
-        }
-</style>
